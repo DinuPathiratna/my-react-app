@@ -3,31 +3,27 @@ import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
-<script>
-  <textarea id="textarea" ></textarea>
-  <button id="check"></button>
-</script>
-function App() {
-  let number = 0
-  const check = document.getElementById("check")
-  const result = document.getElementById("textarea")
 
-  function addOne() {
-    number = number + 1
-    console.log(number)
-    if (number % 2 === 0) {
-        console.log("The number is even.");
-    } else {
-        console.log("The number is odd.");
-    }
-  }
+
+function App() {
+  // Start the counter at 0
+  const [count, setCount] = useState(0);
+
+  // Check if the number is even or odd
+  const result = count % 2 === 0 ? "even" : "odd";
+
   return (
     <div>
-      <button onClick={addOne}>
+      <button onClick={() => setCount(count + 1)}>
         Add one
       </button>
+      <br></br>
+      <textarea
+        value={`Count is ${count}. It is ${result}.`}
+        readOnly
+      />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
