@@ -10,7 +10,7 @@ function App() {
     <div class="base">
       <div class="container">
         <div className="image" style={{ backgroundImage: `url(https://logoeps.com/wp-content/uploads/2012/10/flower-logo-vector.png)` }}></div>
-        <div className="name">Osteospermum</div>
+        <div className="name">Osteosperum</div>
         <div className='desc'>is a genus of flowering plants belonging to the Calenduleae.</div>
         <div className='container2'>
           <div className='icon'>icon</div>
