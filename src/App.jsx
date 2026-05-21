@@ -9,15 +9,15 @@ export default function SectionSwitcher() {
       <div>
         <button
           onClick={() => setActiveSection(1)}>
-          Section #1
+          Section 1
         </button>
         <button
           onClick={() => setActiveSection(2)}>
-          Section #2
+          Section 2
         </button>
         <button
           onClick={() => setActiveSection(3)}>
-          Section #3
+          Section 3
         </button>
       </div>
 
