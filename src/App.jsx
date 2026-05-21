@@ -1,23 +1,32 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
 import './App.css'
 
+function PlantCard({ image, name, desc }) {
+  return (
+    <div className="container">
+      <div className="image" style={{ backgroundImage: `url(${image})` }} />
+      <div className="name">{name}</div>
+      <div className="desc">{desc}</div>
+      <div className="container2">
+        <div className="icon">icon</div>
+        <div className="chart">chart</div>
+        <div className="follow"><b>follow</b></div>
+      </div>
+    </div>
+  );
+}
 
 function App() {
+  const data = {
+    name: "Osteosperum",
+    desc: "is a genus of flowering plants belonging to the Calenduleae.",
+    image: "https://logoeps.com/wp-content/uploads/2012/10/flower-logo-vector.png"
+  };
+
+  const flowersList = [data, data];
+
   return (
-    <div class="base">
-      <div class="container">
-        <div className="image" style={{ backgroundImage: `url(https://logoeps.com/wp-content/uploads/2012/10/flower-logo-vector.png)` }}></div>
-        <div className="name">Osteosperum</div>
-        <div className='desc'>is a genus of flowering plants belonging to the Calenduleae.</div>
-        <div className='container2'>
-          <div className='icon'>icon</div>
-          <div className='chart'>chart</div>
-          <div className='follow'><b>follow</b></div>
-        </div>
-      </div>
+    <div className="base">
+      {flowersList.map((item, index) => <PlantCard key={index} {...item} />)}
     </div>
   );
 }
