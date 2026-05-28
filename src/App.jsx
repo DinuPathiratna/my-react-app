@@ -1,39 +1,17 @@
-import './App.css';
-import React, { useState } from 'react';
+import { Routes, Route } from "react-router-dom";
 
-export default function SectionSwitcher() {
-  const [activeSection, setActiveSection] = useState(1);
+import Home from "./pages/Home";
+import Assignment_1 from "./assignments/Assignment_1";
 
+export default function App() {
   return (
-    <div>
-      <div>
-        <button
-          onClick={() => setActiveSection(1)}>
-          Section 1
-        </button>
-        <button
-          onClick={() => setActiveSection(2)}>
-          Section 2
-        </button>
-        <button
-          onClick={() => setActiveSection(3)}>
-          Section 3
-        </button>
-      </div>
+    <Routes>
+      <Route path="/" element={<Home />} />
 
-      <div>
-        {activeSection === 1 && (
-          <p>this is the first paragraph</p>
-        )}
-
-        {activeSection === 2 && (
-          <p>this is the second paragraph</p>
-        )}
-
-        {activeSection === 3 && (
-          <p>this is the third paragraph</p>
-        )}
-      </div>
-    </div>
+      <Route
+        path="/ASG-01"
+        element={<Assignment_1 />}
+      />
+    </Routes>
   );
 }
