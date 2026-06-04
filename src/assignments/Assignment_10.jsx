@@ -32,7 +32,6 @@ function Assignment_10() {
 
   return (
     <div>
-      <h2>Assignment 10 - JWT Login</h2>
 
       <input
         type="text"
