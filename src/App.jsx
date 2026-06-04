@@ -10,6 +10,7 @@ import Assignment_6 from "./assignments/Assignment_6";
 import Assignment_7 from "./assignments/Assignment_7";
 import Assignment_8 from "./assignments/Assignment_8";
 import Assignment_9 from "./assignments/Assignment_9";
+import Assignment_10 from "./assignments/Assignment_10";
 export default function App() {
   return (
     <Routes>
@@ -24,6 +25,7 @@ export default function App() {
       <Route path="/ASG-07" element={<Assignment_7 />} />
       <Route path="/ASG-08" element={<Assignment_8 />} />
       <Route path="/ASG-09" element={<Assignment_9 />} />
+      <Route path="/ASG-10" element={<Assignment_10 />} />
     </Routes>
   );
 }
