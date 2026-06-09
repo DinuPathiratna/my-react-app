@@ -128,7 +128,7 @@ function Assignment_12() {
                     <h3>User Details</h3>
 
                     <img
-                        src={user.profile_pic}
+                        src={user.avatar}
                         alt="Profile"
                         width="120"
                     />
