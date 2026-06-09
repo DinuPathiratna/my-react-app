@@ -57,6 +57,10 @@ export default function Home() {
       <Link to="/ASG-11">
         <button>Assignment 11</button>
       </Link>
+      <br />
+      <Link to="/ASG-12">
+        <button>Assignment 12</button>
+      </Link>
 
     </div>
   );
