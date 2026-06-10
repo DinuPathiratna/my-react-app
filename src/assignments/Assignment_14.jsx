@@ -15,8 +15,6 @@ function LoginScreen({ setLogged, setUser }) {
                 },
             });
 
-            console.log(userResponse.data);
-
             setUser(userResponse.data);
             setLogged(true);
         } catch (err) {
@@ -79,9 +77,7 @@ function LoginScreen({ setLogged, setUser }) {
                 <input
                     type="checkbox"
                     checked={keepLogged}
-                    onChange={(e) =>
-                        setKeepLogged(e.target.checked)
-                    }
+                    onChange={(e) => setKeepLogged(e.target.checked)}
                 />
                 Keep me logged in
             </label>
@@ -89,7 +85,9 @@ function LoginScreen({ setLogged, setUser }) {
             <br />
             <br />
 
-            <button onClick={login}>Login</button>
+            <button onClick={login}>
+                Login
+            </button>
 
             <br />
             <br />
@@ -99,7 +97,44 @@ function LoginScreen({ setLogged, setUser }) {
     );
 }
 
-function ProfileScreen({ user, setLogged }) {
+function ProfileScreen({ user, setUser, setLogged }) {
+    const [name, setName] = useState(user.name || "");
+    const [description, setDescription] = useState(
+        user.description || ""
+    );
+
+    const saveProfile = async () => {
+        const token =
+            localStorage.getItem("token") ||
+            sessionStorage.getItem("token");
+
+        try {
+            await api.put(
+                "/user",
+                {
+                    name,
+                    description,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            setUser({
+                ...user,
+                name,
+                description,
+            });
+
+            alert("Profile Updated");
+        } catch (err) {
+            console.error(err);
+            alert("Update Failed");
+        }
+    };
+
     const logout = async () => {
         const token =
             localStorage.getItem("token") ||
@@ -139,9 +174,38 @@ function ProfileScreen({ user, setLogged }) {
                 <p>No Profile Picture</p>
             )}
 
-            <p>Name: {user.name}</p>
-            <p>Description: {user.description || "No Description"}</p>
             <p>Email: {user.email}</p>
+
+            <br />
+
+            <input
+                type="text"
+                placeholder="Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+            />
+
+            <br />
+            <br />
+
+            <input
+                type="text"
+                placeholder="Description"
+                value={description}
+                onChange={(e) =>
+                    setDescription(e.target.value)
+                }
+            />
+
+            <br />
+            <br />
+
+            <button onClick={saveProfile}>
+                Save
+            </button>
+
+            <br />
+            <br />
 
             <button onClick={logout}>
                 Logout
@@ -150,7 +214,7 @@ function ProfileScreen({ user, setLogged }) {
     );
 }
 
-function Assignment_13() {
+function Assignment_14() {
     const [logged, setLogged] = useState(false);
     const [user, setUser] = useState(null);
 
@@ -184,6 +248,7 @@ function Assignment_13() {
             {logged ? (
                 <ProfileScreen
                     user={user}
+                    setUser={setUser}
                     setLogged={setLogged}
                 />
             ) : (
@@ -196,4 +261,4 @@ function Assignment_13() {
     );
 }
 
-export default Assignment_13;
+export default Assignment_14;
