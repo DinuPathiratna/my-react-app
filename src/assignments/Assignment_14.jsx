@@ -1,264 +1,233 @@
 import { useState, useEffect } from "react";
 import api from "../api";
 
-function LoginScreen({ setLogged, setUser }) {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [keepLogged, setKeepLogged] = useState(false);
-    const [error, setError] = useState("");
-
-    const getUser = async (token) => {
-        try {
-            const userResponse = await api.get("/user", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            setUser(userResponse.data);
-            setLogged(true);
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const login = async () => {
-        setError("");
-
-        try {
-            const loginResponse = await api.post("/login", {
-                email,
-                password,
-            });
-
-            const token = loginResponse.data.access_token;
-
-            if (keepLogged) {
-                localStorage.setItem("token", token);
-            } else {
-                sessionStorage.setItem("token", token);
-            }
-
-            getUser(token);
-        } catch (err) {
-            console.error(err);
-
-            if (err.response) {
-                setError(err.response.data.message);
-            } else {
-                setError("Something went wrong");
-            }
-        }
-    };
-
-    return (
-        <div>
-            <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-            />
-
-            <br />
-            <br />
-
-            <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-            />
-
-            <br />
-            <br />
-
-            <label>
-                <input
-                    type="checkbox"
-                    checked={keepLogged}
-                    onChange={(e) => setKeepLogged(e.target.checked)}
-                />
-                Keep me logged in
-            </label>
-
-            <br />
-            <br />
-
-            <button onClick={login}>
-                Login
-            </button>
-
-            <br />
-            <br />
-
-            {error && <p>{error}</p>}
-        </div>
-    );
+const getToken = () => {
+  return localStorage.getItem("token") || sessionStorage.getItem("token")
 }
 
-function ProfileScreen({ user, setUser, setLogged }) {
-    const [name, setName] = useState(user.name || "");
-    const [description, setDescription] = useState(
-        user.description || ""
-    );
+function LoginScreen({ setLogged }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [keepLogged, setKeepLogged] = useState(false);
+  const [error, setError] = useState("");
 
-    const saveProfile = async () => {
-        const token =
-            localStorage.getItem("token") ||
-            sessionStorage.getItem("token");
+  const login = async () => {
+    setError("");
 
-        try {
-            await api.put(
-                "/user",
-                {
-                    name,
-                    description,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+    try {
+      const loginResponse = await api.post("/login", {
+        email,
+        password,
+      });
 
-            setUser({
-                ...user,
-                name,
-                description,
-            });
+      const token = loginResponse.data.access_token;
 
-            alert("Profile Updated");
-        } catch (err) {
-            console.error(err);
-            alert("Update Failed");
+      if (keepLogged) {
+        localStorage.setItem("token", token);
+      } else {
+        sessionStorage.setItem("token", token);
+      }
+
+      setLogged(true);
+    } catch (err) {
+      console.error(err);
+
+      if (err.response) {
+        setError(err.response.data.message);
+      } else {
+        setError("Something went wrong");
+      }
+    }
+  };
+
+  return (
+    <div>
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+
+      <br />
+      <br />
+
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+
+      <br />
+      <br />
+
+      <label>
+        <input
+          type="checkbox"
+          checked={keepLogged}
+          onChange={(e) => setKeepLogged(e.target.checked)}
+        />
+        Keep me logged in
+      </label>
+
+      <br />
+      <br />
+
+      <button onClick={login}>
+        Login
+      </button>
+
+      <br />
+      <br />
+
+      {error && <p>{error}</p>}
+    </div>
+  );
+}
+
+function ProfileScreen({ setLogged }) {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [avatar, setAvatar] = useState("");
+  const [email, setEmail] = useState("");
+
+  const getUser = async () => {
+    try {
+      const userResponse = await api.get("/user", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
+
+      setName(userResponse.data.name)
+      setDescription(userResponse.data.description)
+      setAvatar(userResponse.data.avatar)
+      setEmail(userResponse.data.email)
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const saveProfile = async () => {
+
+    try {
+      await api.put(
+        "/user",
+        {
+          name,
+          description,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
         }
-    };
+      );
 
-    const logout = async () => {
-        const token =
-            localStorage.getItem("token") ||
-            sessionStorage.getItem("token");
+      alert("Profile Updated");
+    } catch (err) {
+      console.error(err);
+      alert("Update Failed");
+    }
+  };
 
-        try {
-            await api.post(
-                "/logout",
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-        } catch (err) {
-            console.error(err);
+  const logout = async () => {
+    try {
+      await api.post(
+        "/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
         }
+      );
+    } catch (err) {
+      console.error(err);
+    }
 
-        localStorage.removeItem("token");
-        sessionStorage.removeItem("token");
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
 
-        setLogged(false);
-    };
+    setLogged(false);
+  };
 
-    return (
-        <div>
-            <h3>User Details</h3>
+  useEffect(() => {
+    getUser()
+  }, [])
 
-            {user.avatar ? (
-                <img
-                    src={user.avatar}
-                    alt="Profile"
-                    width="120"
-                />
-            ) : (
-                <p>No Profile Picture</p>
-            )}
+  return (
+    <div>
+      <h3>User Details</h3>
 
-            <p>Email: {user.email}</p>
+      {avatar ? (
+        <img
+          src={avatar}
+          alt="Profile"
+          width="120"
+        />
+      ) : (
+        <p>No Profile Picture</p>
+      )}
 
-            <br />
+      <p>Email: {email}</p>
 
-            <input
-                type="text"
-                placeholder="Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-            />
+      <br />
 
-            <br />
-            <br />
+      <input
+        type="text"
+        placeholder="Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
 
-            <input
-                type="text"
-                placeholder="Description"
-                value={description}
-                onChange={(e) =>
-                    setDescription(e.target.value)
-                }
-            />
+      <br />
+      <br />
 
-            <br />
-            <br />
+      <input
+        type="text"
+        placeholder="Description"
+        value={description}
+        onChange={(e) =>
+          setDescription(e.target.value)
+        }
+      />
 
-            <button onClick={saveProfile}>
-                Save
-            </button>
+      <br />
+      <br />
 
-            <br />
-            <br />
+      <button onClick={saveProfile}>
+        Save
+      </button>
 
-            <button onClick={logout}>
-                Logout
-            </button>
-        </div>
-    );
+      <br />
+      <br />
+
+      <button onClick={logout}>
+        Logout
+      </button>
+    </div>
+  );
 }
 
 function Assignment_14() {
-    const [logged, setLogged] = useState(false);
-    const [user, setUser] = useState(null);
+  const [logged, setLogged] = useState(getToken() !== null);
 
-    useEffect(() => {
-        const token =
-            localStorage.getItem("token") ||
-            sessionStorage.getItem("token");
-
-        if (!token) return;
-
-        const getUser = async () => {
-            try {
-                const userResponse = await api.get("/user", {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
-                setUser(userResponse.data);
-                setLogged(true);
-            } catch (err) {
-                console.error(err);
-            }
-        };
-
-        getUser();
-    }, []);
-
-    return (
-        <div>
-            {logged ? (
-                <ProfileScreen
-                    user={user}
-                    setUser={setUser}
-                    setLogged={setLogged}
-                />
-            ) : (
-                <LoginScreen
-                    setLogged={setLogged}
-                    setUser={setUser}
-                />
-            )}
-        </div>
-    );
+  return (
+    <div>
+      {logged ? (
+        <ProfileScreen
+          setLogged={setLogged}
+        />
+      ) : (
+        <LoginScreen
+          setLogged={setLogged}
+        />
+      )}
+    </div>
+  );
 }
 
 export default Assignment_14;
