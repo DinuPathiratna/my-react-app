@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../api";
 
-/* ================= HELPERS ================= */
 const getToken = () =>
   localStorage.getItem("token") || sessionStorage.getItem("token");
 
@@ -15,7 +14,6 @@ const getErr = (err, fallback) =>
   err.message ||
   fallback;
 
-/* ================= LOGIN ================= */
 function LoginScreen({ setLogged }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -68,7 +66,6 @@ function LoginScreen({ setLogged }) {
   );
 }
 
-/* ================= PROFILE ================= */
 function ProfileScreen({ setLogged }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -228,7 +225,6 @@ function ProfileScreen({ setLogged }) {
   );
 }
 
-/* ================= MAIN ================= */
 function Assignment_16() {
   const [logged, setLogged] = useState(false);
 
