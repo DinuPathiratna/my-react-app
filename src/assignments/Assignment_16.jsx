@@ -1,10 +1,21 @@
 import { useState, useEffect } from "react";
 import api from "../api";
 
-const getToken = () => {
-  return localStorage.getItem("token") || sessionStorage.getItem("token");
-};
+/* ================= HELPERS ================= */
+const getToken = () =>
+  localStorage.getItem("token") || sessionStorage.getItem("token");
 
+const auth = () => ({
+  headers: { Authorization: `Bearer ${getToken()}` }
+});
+
+const getErr = (err, fallback) =>
+  err.response?.data?.error?.message ||
+  err.response?.data?.message ||
+  err.message ||
+  fallback;
+
+/* ================= LOGIN ================= */
 function LoginScreen({ setLogged }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,54 +24,29 @@ function LoginScreen({ setLogged }) {
 
   const login = async () => {
     setError("");
-
     try {
-      const loginResponse = await api.post("/login", {
-        email,
-        password,
-      });
+      const { data } = await api.post("/login", { email, password });
+      const token = data.access_token;
 
-      const token = loginResponse.data.access_token;
-
-      if (keepLogged) {
-        localStorage.setItem("token", token);
-      } else {
-        sessionStorage.setItem("token", token);
-      }
-
+      (keepLogged ? localStorage : sessionStorage).setItem("token", token);
       setLogged(true);
     } catch (err) {
-      console.error(err);
-
-      if (err.response) {
-        setError(err.response.data.message);
-      } else {
-        setError("Something went wrong");
-      }
+      setError(getErr(err, "Login failed"));
     }
   };
 
   return (
     <div>
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-
-      <br />
-      <br />
+      <input value={email} onChange={(e) => setEmail(e.target.value)} />
+      <br /><br />
 
       <input
         type="password"
-        placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <br />
-      <br />
+      <br /><br />
 
       <label>
         <input
@@ -71,19 +57,18 @@ function LoginScreen({ setLogged }) {
         Keep me logged in
       </label>
 
-      <br />
-      <br />
+      <br /><br />
 
       <button onClick={login}>Login</button>
 
-      <br />
-      <br />
+      <br /><br />
 
-      {error && <p>{error}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 }
 
+/* ================= PROFILE ================= */
 function ProfileScreen({ setLogged }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -99,154 +84,70 @@ function ProfileScreen({ setLogged }) {
 
   const getUser = async () => {
     try {
-      const userResponse = await api.get("/user", {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      });
-
-      setName(userResponse.data.name || "");
-      setDescription(userResponse.data.description || "");
-      setAvatar(userResponse.data.avatar || "");
-      setEmail(userResponse.data.email || "");
+      const { data } = await api.get("/user", auth());
+      setName(data.name || "");
+      setDescription(data.description || "");
+      setAvatar(data.avatar || "");
+      setEmail(data.email || "");
     } catch (err) {
       console.error(err);
     }
   };
 
-const saveProfile = async () => {
-  try {
-    await api.put(
-      "/user",
-      {
-        name,
-        description,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      }
-    );
-
-    alert("Profile Updated");
-  } catch (err) {
-    console.error(err);
-
-    if (err.response?.data?.message) {
-      alert(err.response.data.message);
-    } else {
-      alert("Update Failed");
+  const saveProfile = async () => {
+    try {
+      await api.put("/user", { name, description }, auth());
+      alert("Profile Updated");
+    } catch (err) {
+      alert(getErr(err, "Update Failed"));
     }
-  }
-};
+  };
 
-const uploadAvatar = async () => {
-  if (!avatarFile) {
-    alert("Please select an image");
-    return;
-  }
+  const uploadAvatar = async () => {
+    if (!avatarFile) return alert("Please select image");
 
-  const formData = new FormData();
-  formData.append("avatar", avatarFile);
+    const fd = new FormData();
+    fd.append("avatar", avatarFile);
 
-  try {
-    await api.post("/avatar", formData, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    try {
+      await api.post("/avatar", fd, {
+        ...auth(),
+        "Content-Type": "multipart/form-data"
+      });
 
-    alert("Avatar Updated");
-    getUser();
-  } catch (err) {
-    console.error(err);
-
-    if (err.response?.data?.message) {
-      alert(err.response.data.message);
-    } else {
-      alert("Avatar Upload Failed");
+      alert("Avatar Updated");
+      getUser();
+    } catch (err) {
+      alert(getErr(err, "Upload Failed"));
     }
-  }
-};
+  };
 
-const changePassword = async () => {
-  setPasswordError("");
+  const changePassword = async () => {
+    setPasswordError("");
 
-  if (
-    !currentPassword ||
-    !newPassword ||
-    !confirmPassword
-  ) {
-    setPasswordError("All password fields are required");
-    return;
-  }
+    try {
+      await api.put(
+        "/password",
+        { old_password: currentPassword, new_password: newPassword },
+        auth()
+      );
 
-  if (newPassword !== confirmPassword) {
-    setPasswordError("Passwords do not match");
-    return;
-  }
-
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[*\/\-@#$])[A-Za-z\d*\/\-@#$]{8,40}$/;
-
-  if (!passwordRegex.test(newPassword)) {
-    setPasswordError(
-      "Password must be 8-40 chars with uppercase, lowercase, number and special character"
-    );
-    return;
-  }
-
-  try {
-    await api.put(
-      "/password",
-      {
-        old_password: currentPassword,
-        new_password: newPassword,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      }
-    );
-
-    alert("Password Changed");
-    
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-
-  } catch (err) {
-    console.error(err);
-
-    if (err.response?.data?.message) {
-      setPasswordError(err.response.data.message);
-    } else {
-      setPasswordError("Password change failed");
+      alert("Password Changed");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      setPasswordError(getErr(err, "Password change failed"));
     }
-  }
-};
+  };
 
   const logout = async () => {
     try {
-      await api.post(
-        "/logout",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${getToken()}`,
-          },
-        }
-      );
-    } catch (err) {
-      console.error(err);
-    }
+      await api.post("/logout", {}, auth());
+    } catch {}
 
     localStorage.removeItem("token");
     sessionStorage.removeItem("token");
-
     setLogged(false);
   };
 
@@ -256,118 +157,89 @@ const changePassword = async () => {
 
   return (
     <div>
-      <h3>User Details</h3>
+      <h3>Profile</h3>
 
       {avatar ? (
-        <img
-          src={avatar}
-          alt="Profile"
-          width="120"
-        />
+        <img src={avatar} width="120" />
       ) : (
         <p>No Profile Picture</p>
       )}
 
       <p>Email: {email}</p>
 
-      <br />
-
       <input
-        type="text"
-        placeholder="Name"
         value={name}
-        onChange={(e) => setName(e.target.value)}/>
+        onChange={(e) => setName(e.target.value)}
+      />
 
-      <br />
-      <br />
+      <br /><br />
 
       <input
-        type="text"
-        placeholder="Description"
         value={description}
-        onChange={(e) => setDescription(e.target.value)}/>
+        onChange={(e) => setDescription(e.target.value)}
+      />
 
-      <br />
-      <br />
+      <br /><br />
 
       <button onClick={saveProfile}>Save</button>
 
-      <br />
+      <br /><br />
 
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => setAvatarFile(e.target.files[0])}/>
+      <input type="file" onChange={(e) => setAvatarFile(e.target.files[0])} />
+      <button onClick={uploadAvatar}>Upload</button>
 
-      <button onClick={uploadAvatar}>Upload Avatar</button>
-
-      <br />
-      <br />
+      <br /><br />
 
       <input
         type="password"
         placeholder="Current Password"
         value={currentPassword}
-        onChange={(e) =>
-          setCurrentPassword(e.target.value)
-        }/>
+        onChange={(e) => setCurrentPassword(e.target.value)}
+      />
 
-      <br />
-      <br />
+      <br /><br />
 
       <input
         type="password"
         placeholder="New Password"
         value={newPassword}
-        onChange={(e) =>
-          setNewPassword(e.target.value)
-        }/>
+        onChange={(e) => setNewPassword(e.target.value)}
+      />
 
-      <br />
-      <br />
+      <br /><br />
 
       <input
         type="password"
-        placeholder="Re-Enter New Password"
+        placeholder="Confirm Password"
         value={confirmPassword}
-        onChange={(e) =>
-          setConfirmPassword(e.target.value)
-        }
+        onChange={(e) => setConfirmPassword(e.target.value)}
       />
 
-      <br />
-      <br />
+      <br /><br />
 
-      {passwordError && (
-        <p>{passwordError}</p>
-      )}
+      {passwordError && <p style={{ color: "red" }}>{passwordError}</p>}
 
-      <button onClick={changePassword}> Change Password</button>
+      <button onClick={changePassword}>Change Password</button>
 
-      <br />
+      <br /><br />
 
       <button onClick={logout}>Logout</button>
     </div>
   );
 }
 
+/* ================= MAIN ================= */
 function Assignment_16() {
-  const [logged, setLogged] = useState(
-    getToken() !== null
-  );
+  const [logged, setLogged] = useState(false);
 
-  return (
-    <div>
-      {logged ? (
-        <ProfileScreen
-          setLogged={setLogged}
-        />
-      ) : (
-        <LoginScreen
-          setLogged={setLogged}
-        />
-      )}
-    </div>
+  useEffect(() => {
+    setLogged(!!getToken());
+  }, []);
+
+  return logged ? (
+    <ProfileScreen setLogged={setLogged} />
+  ) : (
+    <LoginScreen setLogged={setLogged} />
   );
 }
 
