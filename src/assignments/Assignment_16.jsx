@@ -114,104 +114,120 @@ function ProfileScreen({ setLogged }) {
     }
   };
 
-  const saveProfile = async () => {
-    try {
-      await api.put(
-        "/user",
-        {
-          name,
-          description,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${getToken()}`,
-          },
-        }
-      );
-
-      alert("Profile Updated");
-    } catch (err) {
-      console.error(err);
-      alert("Update Failed");
-    }
-  };
-
-  const uploadAvatar = async () => {
-    if (!avatarFile) {
-      alert("Please select an image");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("avatar", avatarFile);
-
-    try {
-      await api.post("/avatar", formData, {
+const saveProfile = async () => {
+  try {
+    await api.put(
+      "/user",
+      {
+        name,
+        description,
+      },
+      {
         headers: {
           Authorization: `Bearer ${getToken()}`,
-          "Content-Type": "multipart/form-data",
         },
-      });
+      }
+    );
 
-      alert("Avatar Updated");
-      getUser();
-    } catch (err) {
-      console.error(err);
+    alert("Profile Updated");
+  } catch (err) {
+    console.error(err);
+
+    if (err.response?.data?.message) {
+      alert(err.response.data.message);
+    } else {
+      alert("Update Failed");
+    }
+  }
+};
+
+const uploadAvatar = async () => {
+  if (!avatarFile) {
+    alert("Please select an image");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("avatar", avatarFile);
+
+  try {
+    await api.post("/avatar", formData, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    alert("Avatar Updated");
+    getUser();
+  } catch (err) {
+    console.error(err);
+
+    if (err.response?.data?.message) {
+      alert(err.response.data.message);
+    } else {
       alert("Avatar Upload Failed");
     }
-  };
+  }
+};
 
-  const changePassword = async () => {
-    setPasswordError("");
+const changePassword = async () => {
+  setPasswordError("");
 
-    if (
-      !currentPassword ||
-      !newPassword ||
-      !confirmPassword
-    ) {
-      setPasswordError("All password fields are required");
-      return;
-    }
+  if (
+    !currentPassword ||
+    !newPassword ||
+    !confirmPassword
+  ) {
+    setPasswordError("All password fields are required");
+    return;
+  }
 
-    if (newPassword !== confirmPassword) {
-      setPasswordError("Passwords do not match");
-      return;
-    }
+  if (newPassword !== confirmPassword) {
+    setPasswordError("Passwords do not match");
+    return;
+  }
 
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[*\/\-@#$])[A-Za-z\d*\/\-@#$]{8,40}$/;
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[*\/\-@#$])[A-Za-z\d*\/\-@#$]{8,40}$/;
 
-    if (!passwordRegex.test(newPassword)) {
-      setPasswordError(
-        "Password must be 8-40 chars with uppercase, lowercase, number and special character"
-      );
-      return;
-    }
+  if (!passwordRegex.test(newPassword)) {
+    setPasswordError(
+      "Password must be 8-40 chars with uppercase, lowercase, number and special character"
+    );
+    return;
+  }
 
-    try {
-      await api.put(
-        "/password",
-        {
-          old_password: currentPassword,
-          new_password: newPassword,
+  try {
+    await api.put(
+      "/password",
+      {
+        old_password: currentPassword,
+        new_password: newPassword,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${getToken()}`,
-          },
-        }
-      );
+      }
+    );
 
-      alert("Password Changed");
+    alert("Password Changed");
+    
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
 
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch (err) {
-      console.error(err);
+  } catch (err) {
+    console.error(err);
+
+    if (err.response?.data?.message) {
+      setPasswordError(err.response.data.message);
+    } else {
       setPasswordError("Password change failed");
     }
-  };
+  }
+};
 
   const logout = async () => {
     try {
