@@ -2,7 +2,7 @@ body {
   font-family: Arial;
   text-align: center;
   margin-top: 100px;
-  background-color: #185f59;
+  background-color: #454b4b;
 }
 
 button {
@@ -10,7 +10,7 @@ button {
   padding: 10px;
   margin: 10px;
   border-radius: 5px;
-  background-color: rgb(12, 35, 46);
+  background-color: rgb(15, 18, 20);
   color: rgb(255, 255, 255);
 }
 
