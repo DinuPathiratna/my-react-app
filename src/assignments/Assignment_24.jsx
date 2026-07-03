@@ -26,8 +26,7 @@ export default function Assignment_24() {
         <div style={{ display: "flex",
                      flexDirection: "column",
                      gap: "20px" ,
-                     fontSize:"40px"}
-                     }>
+                     fontSize:"40px"}}>
             <div>
                 <NumberIncrement value={500000} />
             </div>
