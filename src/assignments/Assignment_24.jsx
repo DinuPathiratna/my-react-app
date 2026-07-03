@@ -34,7 +34,7 @@ export default function Assignment_24() {
                 <NumberIncrement value={500} />
             </div>
             <div>
-                <NumberIncrement value={125476} />
+                <NumberIncrement value={125470} />
             </div>
             <div>
                 <NumberIncrement value={75747} />
