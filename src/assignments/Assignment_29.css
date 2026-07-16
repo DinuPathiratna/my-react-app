@@ -10,38 +10,55 @@
 
 .speaker {
     fill: #fffcfc;
+    transition: transform .35s ease;
+    transform-origin: center;
 }
 
 .wave,
-.cross {
+.slash {
     fill: none;
-    stroke: #ffffff;
-    stroke-width: 3;
+    stroke: #8b8282;
+    stroke-width: 4;
     stroke-linecap: round;
-    transition: all .35s ease;
 }
 
 /* default */
 
 .wave {
     opacity: 1;
-    transform-origin: center;
+    transform-origin: 34px 32px;
+    transition:
+        opacity .25s ease,
+        transform .35s ease;
 }
 
-.cross {
+.slash {
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+
     opacity: 0;
-    transform: scale(.5) rotate(-20deg);
-    transform-origin: center;
-}
 
+    transition:
+        stroke-dashoffset .35s ease,
+        opacity .15s ease;
+}
 /* muted */
 
-.muted .wave {
+.muted .wave1 {
     opacity: 0;
-    transform: translateX(8px) scale(.5);
+    transform: scale(.4);
 }
 
-.muted .cross {
+.muted .wave2 {
+    opacity: 0;
+    transform: scale(.2);
+}
+
+.muted .slash {
     opacity: 1;
-    transform: scale(1) rotate(0deg);
+    stroke-dashoffset: 0;
+}
+
+.muted .speaker {
+    transform: scale(.95);
 }
