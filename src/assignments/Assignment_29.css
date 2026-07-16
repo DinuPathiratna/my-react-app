@@ -1,0 +1,47 @@
+.volume-button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.volume-icon {
+    overflow: visible;
+}
+
+.speaker {
+    fill: #fffcfc;
+}
+
+.wave,
+.cross {
+    fill: none;
+    stroke: #ffffff;
+    stroke-width: 3;
+    stroke-linecap: round;
+    transition: all .35s ease;
+}
+
+/* default */
+
+.wave {
+    opacity: 1;
+    transform-origin: center;
+}
+
+.cross {
+    opacity: 0;
+    transform: scale(.5) rotate(-20deg);
+    transform-origin: center;
+}
+
+/* muted */
+
+.muted .wave {
+    opacity: 0;
+    transform: translateX(8px) scale(.5);
+}
+
+.muted .cross {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+}
