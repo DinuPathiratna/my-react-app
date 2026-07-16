@@ -7,13 +7,15 @@ function Assignment_29() {
     return (
         <button
             className={`volume-button ${muted ? "muted" : ""}`}
-            onClick={() => setMuted(!muted)}>
+            onClick={() => setMuted(!muted)}
+        >
             <svg
                 className="volume-icon"
                 viewBox="0 0 64 64"
                 width="80"
                 height="80"
             >
+
                 <polygon
                     className="speaker"
                     points="10,24 22,24 34,14 34,50 22,40 10,40"
@@ -31,11 +33,12 @@ function Assignment_29() {
 
                 <line
                     className="slash"
-                    x1="16"
+                    x1="12"
                     y1="48"
                     x2="50"
                     y2="16"
                 />
+
             </svg>
         </button>
     );
