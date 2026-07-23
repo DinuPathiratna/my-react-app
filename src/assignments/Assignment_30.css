@@ -1,0 +1,33 @@
+.menu-button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.menu-icon {
+    overflow: visible;
+}
+
+.line {
+    fill: none;
+    stroke: white;
+    stroke-width: 6;
+    stroke-linecap: round;
+    transform-origin: 50px 50px;
+    transition: transform 0.4s ease,
+                opacity 0.3s ease;
+}
+
+/* Open */
+
+.menu-icon.open .top {
+    transform: translateY(35px) rotate(45deg) translateX(-25px);
+}
+
+.menu-icon.open .middle {
+    opacity: 0;
+}
+
+.menu-icon.open .bottom {
+    transform: translateY(-30px) rotate(-45deg) translateX(-25px);
+}
