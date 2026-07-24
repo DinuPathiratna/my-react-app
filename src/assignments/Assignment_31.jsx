@@ -24,7 +24,7 @@ export default function Assignment_31() {
       <style>{`
         @keyframes soundWaveWaveform {
           0%, 100% {
-            transform: scaleY(0.18); 
+            transform: scaleY(0.3); 
           }
           50% {
             transform: scaleY(var(--peak-scale, 0.9));  
@@ -33,11 +33,11 @@ export default function Assignment_31() {
         
         .wave-bar-element {
           transform-origin: center;
-          transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+          transition: transform 0.2s steps(2, end);
         }
 
         .wave-bar-active {
-          animation: soundWaveWaveform 1.2s ease-in-out infinite;
+          animation: soundWaveWaveform 0.8s steps(4, end) infinite;
         }
       `}</style>
 
@@ -77,23 +77,21 @@ export default function Assignment_31() {
         height={svgHeight}
         viewBox={`0 0 ${svgWidth} ${svgHeight}`}
         fill="none"
-        xmlns="http://w3.org/2000/svg" 
+        xmlns="http://www.w3.org/2000/svg" 
       >
         {Array.from({ length: totalBars }).map((_, index) => {
 
           const randomFactor = Math.abs(Math.sin(index * 12 + 78) * 43758.5453) % 1;
           const randomPeakFactor = Math.abs(Math.sin(index * 45 + 12) * 25) % 1;
           
-          const maxPossibleHeight = svgHeight - 1;
-          
-          const baselineHeight = 4 + randomFactor * (maxPossibleHeight - 1);
+          const baselineHeight = 16;
 
           const xPosition = index * spacing + 2;
           const yPosition = (svgHeight - baselineHeight) / 2;
 
           const uniqueDelay = `${(randomFactor * -1.5).toFixed(2)}s`;
 
-          const customPeakScale = 0.8 + randomPeakFactor * 0.7;
+          const customPeakScale = 0.4 + randomPeakFactor * 1.1;
 
           return (
             <rect
@@ -108,7 +106,7 @@ export default function Assignment_31() {
               
               style={{
                 animationDelay: uniqueDelay,
-                transform: isPlaying ? undefined : 'scaleY(0.18)',
+                transform: isPlaying ? undefined : 'scaleY(0.3)',
                 '--peak-scale': customPeakScale
               }}/>
           );
